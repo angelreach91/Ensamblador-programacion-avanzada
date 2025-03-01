@@ -1,0 +1,35 @@
+;Ejemplo de código en ensamblador
+;Este código imprime "Playboi Carti" en el display de texto dentro del simulador
+
+JMP boot
+
+stackTop    EQU 0xFF    ; Pila inicial
+txtDisplay  EQU 0x2E0   ; Dirección de la pantalla de texto
+
+message:	
+	DB "Playboi Carti"		; Mensaje a mostrar
+	DB 0					; Terminador de string
+
+boot:
+	MOV SP, stackTop		; Configura el puntero de pila
+	MOV C, message			; C apunta al mensaje
+	MOV D, txtDisplay		; D apunta al display de texto
+
+	CALL print_msg			; Imprimir el mensaje
+	HLT						; Detener la ejecución
+
+print_msg:					; Función para imprimir mensaje
+	PUSH A
+	PUSH B
+	MOV B, 0
+loop_print:
+	MOVB AL, [C]			; Cargar un carácter
+	MOVB [D], AL			; Escribirlo en el display
+	INC C
+	INC D
+	CMPB AL, 0				; Verificar fin de string (terminador 0)
+	JNZ loop_print			; Repetir hasta terminar
+
+	POP B
+	POP A
+	RET
